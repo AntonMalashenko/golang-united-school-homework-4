@@ -40,29 +40,6 @@ const EMPTY = ""
 // with fmt.Errorf function
 //
 // Use the errors defined above as described, again wrapping into fmt.Errorf
-
-func checkOperands(input string) (res bool, err error) {
-	limit := 2
-	exists := 0
-	for _, v := range input {
-		_, ok := allowedOperands[v]
-		if ok {
-			exists++
-			if exists > limit {
-				return false, fmt.Errorf("%w", errorNotTwoOperands)
-			}
-		} else if v != '-' && v != '+' {
-			_, err := strconv.Atoi(string(v))
-			err = fmt.Errorf("%w", err)
-			return false, err
-		}
-	}
-	if exists < limit {
-		return false, fmt.Errorf("%w", errorNotTwoOperands)
-	}
-	return true, nil
-}
-
 func removeSpaces(input string) string {
 	resultList := make([]rune, 0)
 	for _, ch := range input {
@@ -81,7 +58,7 @@ func addIntFromStrInput(targetSlise []int, input string) []int {
 	return targetSlise
 }
 
-func parseString(input string) (result []int) {
+func parseString(input string) (result []int, err error) {
 	tempVal := EMPTY
 	for _, val := range input {
 		if val == '-' || val == '+' {
@@ -89,14 +66,20 @@ func parseString(input string) (result []int) {
 				result = addIntFromStrInput(result, tempVal)
 			}
 			tempVal = EMPTY
+
+		} else if _, ok := allowedOperands[val]; !ok {
+			_, err := strconv.Atoi(string(val))
+			return result, fmt.Errorf("%w", err)
 		}
 		tempVal = tempVal + string(val)
 	}
 	if tempVal != EMPTY {
 		result = addIntFromStrInput(result, tempVal)
 	}
-
-	return result
+	if len(result) != 2 {
+		return result, fmt.Errorf("%w", errorNotTwoOperands)
+	}
+	return result, nil
 }
 
 func StringSum(input string) (output string, err error) {
@@ -104,14 +87,13 @@ func StringSum(input string) (output string, err error) {
 	intResult := 0
 
 	if len(input) == 0 {
-		return "", err
+		return "", fmt.Errorf("%w", errorEmptyInput)
 	}
-	_, err = checkOperands(input)
+
+	operandsList, err := parseString(input)
 	if err != nil {
 		return "", err
 	}
-
-	operandsList := parseString(input)
 	for _, v := range operandsList {
 		intResult = intResult + v
 	}
