@@ -2,7 +2,8 @@ package string_sum
 
 import (
 	"errors"
-	"strings"
+	"fmt"
+	"unicode"
 )
 
 //use these errors as appropriate, wrapping them with fmt.Errorf function
@@ -10,7 +11,8 @@ var (
 	// Use when the input is empty, and input is considered empty if the string contains only whitespace
 	errorEmptyInput = errors.New("input is empty")
 	// Use when the expression has number of operands not equal to two
-	errorNotTwoOperands = errors.New("expecting two operands, but received more or less")
+	errorNotTwoOperands   = errors.New("expecting two operands, but received more or less")
+	errorUsupportedSymbol = errors.New("custom error")
 
 	allowedOperands = map[rune]struct{}{
 		'0': struct{}{},
@@ -36,7 +38,7 @@ var (
 //
 // Use the errors defined above as described, again wrapping into fmt.Errorf
 
-func checkOperands(input string) (res bool) {
+func checkOperands(input string) (res bool, err error) {
 	limit := 2
 	exists := 0
 	for _, v := range input {
@@ -44,24 +46,37 @@ func checkOperands(input string) (res bool) {
 		if ok {
 			exists++
 			if exists > limit {
-				return false
+				return false, errorNotTwoOperands
 			}
+		} else if v != '-' && v != '+' {
+			return false, errorUsupportedSymbol
 		}
 	}
 	if exists < limit {
-		return false
+		return false, errorNotTwoOperands
 	}
-	return true
+	return true, nil
+}
+
+func removeSpaces(input string) string {
+	resultList := make([]rune, 0)
+	for _, ch := range input {
+		if !unicode.IsSpace(ch) {
+			resultList = append(resultList, ch)
+		}
+	}
+	return string(resultList)
 }
 
 func StringSum(input string) (output string, err error) {
-	input = strings.TrimSpace(input)
+	input = removeSpaces(input)
 
 	if len(input) == 0 {
 		return output, errorEmptyInput
 	}
-	if !checkOperands(input) {
-		return output, errorNotTwoOperands
+	_, err = checkOperands(input)
+	if err != nil {
+		return output, fmt.Errorf("%v", err.Error())
 	}
 
 	return "", nil
