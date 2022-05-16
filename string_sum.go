@@ -102,7 +102,7 @@ func StringSum(input string) (output string, err error) {
 	intResult := 0
 
 	if len(input) == 0 {
-		return "", errorEmptyInput
+		return "", fmt.Errorf("%v", errorEmptyInput.Error())
 	}
 	_, err = checkOperands(input)
 	if err != nil {
