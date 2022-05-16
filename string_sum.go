@@ -102,11 +102,11 @@ func StringSum(input string) (output string, err error) {
 	intResult := 0
 
 	if len(input) == 0 {
-		return output, errorEmptyInput
+		return "", errorEmptyInput
 	}
 	_, err = checkOperands(input)
 	if err != nil {
-		return output, fmt.Errorf("%v", err.Error())
+		return "", fmt.Errorf("%v", err.Error())
 	}
 
 	operandsList := parseString(input)
