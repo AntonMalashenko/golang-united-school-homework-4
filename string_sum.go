@@ -44,7 +44,7 @@ func checkOperands(input string) (res bool, err error) {
 	for _, v := range input {
 		_, ok := allowedOperands[v]
 		if ok {
-			exists++
+			exists = exists + 1
 			if exists > limit {
 				return false, errorNotTwoOperands
 			}
