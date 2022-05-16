@@ -44,6 +44,7 @@ func checkOperands(input string) (res bool, err error) {
 	for _, v := range input {
 		_, ok := allowedOperands[v]
 		if ok {
+
 			exists = exists + 1
 			if exists > limit {
 				return false, errorNotTwoOperands
@@ -72,7 +73,7 @@ func StringSum(input string) (output string, err error) {
 	input = removeSpaces(input)
 
 	if len(input) == 0 {
-		return output, errorEmptyInput
+		return output, fmt.Errorf("%v", errorEmptyInput.Error())
 	}
 	_, err = checkOperands(input)
 	if err != nil {
