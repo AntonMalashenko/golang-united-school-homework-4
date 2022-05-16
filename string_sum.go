@@ -52,7 +52,8 @@ func checkOperands(input string) (res bool, err error) {
 				return false, errorNotTwoOperands
 			}
 		} else if v != '-' && v != '+' {
-			return false, errorUsupportedSymbol
+			_, err := strconv.Atoi(string(v))
+			return false, err
 		}
 	}
 	if exists < limit {
@@ -106,7 +107,7 @@ func StringSum(input string) (output string, err error) {
 	}
 	_, err = checkOperands(input)
 	if err != nil {
-		return "", fmt.Errorf("%v", err.Error())
+		return "", fmt.Errorf("%v", err)
 	}
 
 	operandsList := parseString(input)
