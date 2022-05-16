@@ -49,15 +49,16 @@ func checkOperands(input string) (res bool, err error) {
 		if ok {
 			exists++
 			if exists > limit {
-				return false, errorNotTwoOperands
+				return false, fmt.Errorf("%w", errorNotTwoOperands)
 			}
 		} else if v != '-' && v != '+' {
 			_, err := strconv.Atoi(string(v))
+			err = fmt.Errorf("%w", err)
 			return false, err
 		}
 	}
 	if exists < limit {
-		return false, errorNotTwoOperands
+		return false, fmt.Errorf("%w", errorNotTwoOperands)
 	}
 	return true, nil
 }
@@ -103,11 +104,11 @@ func StringSum(input string) (output string, err error) {
 	intResult := 0
 
 	if len(input) == 0 {
-		return "", fmt.Errorf("%v", errorEmptyInput.Error())
+		return "", err
 	}
 	_, err = checkOperands(input)
 	if err != nil {
-		return "", fmt.Errorf("%v", err)
+		return "", err
 	}
 
 	operandsList := parseString(input)
