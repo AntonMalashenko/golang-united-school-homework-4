@@ -3,6 +3,7 @@ package string_sum
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"unicode"
 )
 
@@ -14,19 +15,21 @@ var (
 	errorNotTwoOperands   = errors.New("expecting two operands, but received more or less")
 	errorUsupportedSymbol = errors.New("custom error")
 
-	allowedOperands = map[rune]struct{}{
-		'0': struct{}{},
-		'1': struct{}{},
-		'2': struct{}{},
-		'3': struct{}{},
-		'4': struct{}{},
-		'5': struct{}{},
-		'6': struct{}{},
-		'7': struct{}{},
-		'8': struct{}{},
-		'9': struct{}{},
+	allowedOperands = map[rune]int{
+		'0': 0,
+		'1': 0,
+		'2': 0,
+		'3': 0,
+		'4': 0,
+		'5': 0,
+		'6': 0,
+		'7': 0,
+		'8': 0,
+		'9': 0,
 	}
 )
+
+const EMPTY = ""
 
 // Implement a function that computes the sum of two int numbers written as a string
 // For example, having an input string "3+5", it should return output string "8" and nil error
@@ -44,8 +47,7 @@ func checkOperands(input string) (res bool, err error) {
 	for _, v := range input {
 		_, ok := allowedOperands[v]
 		if ok {
-
-			exists = exists + 1
+			exists++
 			if exists > limit {
 				return false, errorNotTwoOperands
 			}
@@ -69,16 +71,47 @@ func removeSpaces(input string) string {
 	return string(resultList)
 }
 
+func addIntFromStrInput(targetSlise []int, input string) []int {
+	intToAdd, err := strconv.Atoi(input)
+	if err == nil {
+		targetSlise = append(targetSlise, intToAdd)
+	}
+	return targetSlise
+}
+
+func parseString(input string) (result []int) {
+	tempVal := EMPTY
+	for _, val := range input {
+		if val == '-' || val == '+' {
+			if tempVal != EMPTY {
+				result = addIntFromStrInput(result, tempVal)
+			}
+			tempVal = EMPTY
+		}
+		tempVal = tempVal + string(val)
+	}
+	if tempVal != EMPTY {
+		result = addIntFromStrInput(result, tempVal)
+	}
+
+	return result
+}
+
 func StringSum(input string) (output string, err error) {
 	input = removeSpaces(input)
+	intResult := 0
 
 	if len(input) == 0 {
-		return output, fmt.Errorf("%v", errorEmptyInput.Error())
+		return output, errorEmptyInput
 	}
 	_, err = checkOperands(input)
 	if err != nil {
 		return output, fmt.Errorf("%v", err.Error())
 	}
 
-	return "", nil
+	operandsList := parseString(input)
+	for _, v := range operandsList {
+		intResult = intResult + v
+	}
+	return strconv.Itoa(intResult), nil
 }
